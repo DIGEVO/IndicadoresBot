@@ -1,5 +1,9 @@
+'use strict';
+
 var restify = require('restify');
 var builder = require('botbuilder');
+
+const RestClient = require('./BusinessLogic/RestClient');
 
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
@@ -19,12 +23,12 @@ server.post('/api/messages', connector.listen());
 bot.dialog('/', [
     function (session, result, next) {
         //ver la hora del usuario y saludarlo apropidamente...
-        builder.Prompts.choice(session, 
-        `Hola ${session.message.user.name}, ¿cuál acción desea realizar?`, 
-        'Comparar valor de indicador|Conocer valor de indicador', { listStyle: builder.ListStyle.button });
+        builder.Prompts.choice(session,
+            `Hola ${session.message.user.name}, ¿cuál acción desea realizar?`,
+            'Comparar valor de indicador|Conocer valor de indicador', { listStyle: builder.ListStyle.button });
     },
     function (session, result) {
-        session.dialogData.opcion = result.response.entity;        
+        session.dialogData.opcion = result.response.entity;
         builder.Prompts.choice(session, '¿Cuál de los siguientes indicadores deseas conocer?',
             ['Unidad de fomento', 'Indice de valor promedio',
                 'Dólar observado', ' Dólar acuerdo', 'Euro',
@@ -44,13 +48,16 @@ bot.dialog('/', [
 
         let now = new Date();
 
-        if (session.dialogData.fecha.getTime() > now.getTime()) {
+        let fecha = session.dialogData.fecha;
+        fecha.setHours(0);
+        fecha.setMinutes(0);
+        fecha.setSeconds(0);
+        fecha.setMilliseconds(0);
+        if (fecha.getTime() > now.getTime()) {
             session.endDialog(`Uff! desea predecir y ${session.dialogData.opcion.toLowerCase()} **${session.dialogData.indicador}**, 
         de la fecha **${session.dialogData.fecha.toDateString()}**`);
         } else {
-            session.endDialog(`Desea ${session.dialogData.opcion.toLowerCase()} **${session.dialogData.indicador}**, 
-        de la fecha **${session.dialogData.fecha.toDateString()}**`);
+            RestClient.getValue(session);
         }
-
     }
 ]);

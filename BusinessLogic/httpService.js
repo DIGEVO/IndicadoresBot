@@ -9,25 +9,9 @@ module.exports = {
     },
 
     _makeRequest(method, urlString, options) {
-
-        // create a new Promise
         return new Promise((resolve, reject) => {
-
-            /* Node's URL library allows us to create a
-             * URL object from our request string, so we can build
-             * our request for http.get */
             const parsedUrl = url.parse(urlString);
-
             const requestOptions = this._createOptions(method, parsedUrl);
-
-            // let requestOptions = {
-            //     hostname: 'mindicador.cl',
-            //     path: '/api/dolar/2017',
-            //     port: 80
-            //     //,
-            //     //'GET'
-            // }
-
             const request = http.get(requestOptions, res =>
                 this._onResponse(res, resolve, reject));
 
@@ -39,16 +23,6 @@ module.exports = {
         });
     },
 
-    // the options that are required by http.get
-    //     var options = {
-    //     host: 'somesite.com',
-    //     port: 443,
-    //     path: '/some/path',
-    //     method: 'GET',
-    //     headers: {
-    //         'Content-Type': 'application/json'
-    //     }
-    // };
     _createOptions(method, url) {
         return {
             hostname: url.hostname,
@@ -58,8 +32,6 @@ module.exports = {
         };
     },
 
-    /* once http.get returns a response, build it and 
-     * resolve or reject the Promise */
     _onResponse(response, resolve, reject) {
         const hasResponseFailed = response.status >= 400;
         var responseBody = '';
@@ -68,11 +40,8 @@ module.exports = {
             reject(`Request to ${response.url} failed with HTTP ${response.status}`);
         }
 
-        /* the response stream's (an instance of Stream) current data. See:
-         * https://nodejs.org/api/stream.html#stream_event_data */
         response.on('data', chunk => responseBody += chunk.toString());
 
-        // once all the data has been read, resolve the Promise 
         response.on('end', () => resolve(responseBody));
     }
 };
