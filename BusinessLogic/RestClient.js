@@ -3,7 +3,10 @@
 const httpService = require('./httpService');
 
 module.exports = {
-    getValue(session) {
+
+    toCompareValue(session) { },
+
+    toKnowValue(session) {
         const indicador = this._Indicators[session.dialogData.indicador];
         const fecha = this._formatDate(session.dialogData.fecha);
         const url = `http://mindicador.cl/api/${indicador}/${fecha}`;
@@ -13,7 +16,7 @@ module.exports = {
                 const result = JSON.parse(data);
                 session.endDialog(`El indicador **${session.dialogData.indicador}** 
                 para la fecha **${fecha}** es 
-                **${result.serie[0].valor}**`);
+                **${result.serie.length != 0 ? result.serie[0].valor : "No existe valor para ese día"}**`);
             })
             .catch(function (error) {
                 session.endDialog(`Lo sentimos, ha ocurrido el sgte error **${error}**`);

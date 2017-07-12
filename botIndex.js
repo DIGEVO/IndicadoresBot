@@ -57,7 +57,13 @@ bot.dialog('/', [
             session.endDialog(`Uff! desea predecir y ${session.dialogData.opcion.toLowerCase()} **${session.dialogData.indicador}**, 
         de la fecha **${session.dialogData.fecha.toDateString()}**`);
         } else {
-            RestClient.getValue(session);
+            if (session.dialogData.opcion == 'Conocer valor de indicador') {
+                RestClient.toKnowValue(session);
+            } else {
+                session.endDialog(`Trabajando para darte la comparación del valor del indicador 
+                **${session.dialogData.indicador}** de la fecha **${session.dialogData.fecha.toDateString()}** 
+                con respecto a la fecha actual`);
+            }
         }
     }
 ]);
